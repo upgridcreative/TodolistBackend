@@ -10,7 +10,9 @@ def is_valid_email(email: str):
     return re.fullmatch(valid_email_regex, email)
 
 
-def is_valid_password(password: str) -> list[bool, list[str]]:
+    
+# def is_valid_password(password: str) -> list[bool, list[str]]:
+def is_valid_password(password: str):
     try:
         validate_password(password)
         return True, []
