@@ -16,13 +16,13 @@ from core.models import User
 @api_view(['POST', ])
 def register_user(request):
     exists, response, fields = getFieldsOfRequest(
-        request, ['email', 'password', 'name'])
+        request, ['email', 'password', 'first_name','last_name'])
 
     if not exists:
         return Response(
             data={'required': response, 'code': 'fields-not-given'}, status=400)
 
-    email, password, name = fields
+    email, password, f_name, l_name = fields
     # Todo: Check if name is empty
     # Todo:Check if email exists (as in if the email is realy a valid email)
 
@@ -43,7 +43,7 @@ def register_user(request):
             {'email': 'user already exists', 'code': 'already-exists'})
 
     instance: User = User(
-        email=email, name=name)
+        email=email, first_name=f_name,last_name=l_name)
 
     instance.set_password(password)  # Set hashed password
     instance.save()
