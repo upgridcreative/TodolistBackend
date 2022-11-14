@@ -23,8 +23,8 @@ def register_user(request):
             data={'required': response, 'code': 'fields-not-given'}, status=400)
 
     email, password, name = fields
-    #Todo: Check if name is empty
-    #Todo:Check if email exists (as in if the email is realy a valid email)
+    # Todo: Check if name is empty
+    # Todo:Check if email exists (as in if the email is realy a valid email)
 
     if not is_valid_email(email):
         return Response(
@@ -48,7 +48,8 @@ def register_user(request):
     instance.set_password(password)  # Set hashed password
     instance.save()
 
-    threading.Thread(target =otp_utils.send_email_verification,args=(instance,)).start() #Resort to this method of verification better UI experice 
+    threading.Thread(target=otp_utils.send_email_verification, args=(
+        instance,)).start()  
     tokens = get_tokens_for_user(instance)
 
     return Response(
@@ -56,7 +57,7 @@ def register_user(request):
 
 
 @permission_classes([IsAuthenticated, ])
-@api_view(['POST',])
+@api_view(['POST', ])
 def verify_email(request):
     exists, response, fields = getFieldsOfRequest(
         request, ['otp'])
