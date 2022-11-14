@@ -28,6 +28,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.name or 'Not provided'
 
+    def is_verified(self):
+        return self.email_verified
+
 
 class VerifyEmailKey(models.Model):
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
@@ -38,4 +41,16 @@ class VerifyEmailKey(models.Model):
 class OutstandingTokenAdmin(OutstandingTokenDefaultAdmin):
     def has_delete_permission(self, *args, **kwargs):
         return True  # check if it is superuser
+
+
+class Categories(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, null=False)
+    title = models.CharField(max_length=30, null=False)
+    color = models.CharField(max_length=10, null=False)
+
+    def get_updatible_fields(self):
+        return [
+            'title',
+            'color'
+        ]
 
