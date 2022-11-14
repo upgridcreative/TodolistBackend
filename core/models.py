@@ -13,7 +13,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
-    name = models.CharField(_('name'), max_length=150)
+    first_name = models.CharField(_('first_name'), max_length=30)
+    last_name = models.CharField(_('last_name'), max_length=30)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
@@ -30,6 +31,15 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def is_verified(self):
         return self.email_verified
+
+
+    def get_updatible_fields(self):
+        return [
+            'name',
+        ]
+
+
+    
 
 
 class VerifyEmailKey(models.Model):
