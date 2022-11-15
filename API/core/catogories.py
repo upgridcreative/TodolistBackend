@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from utils.request import getFieldsOfRequest, getUpdateFieldsOfRequest
 
 
-@permission_classes([IsAuthenticated, ])
+@permission_classes([IsVerfified, ])
 @api_view(['POST', ])
 def create_catagory(request):
     user = request.user
@@ -17,7 +17,7 @@ def create_catagory(request):
     exists, response, fields = getFieldsOfRequest(
         request, ['title', 'color', ])
 
-    if not exists:
+    if not exists: #Todo change varaible name
         return Response(
             data={'required': response, 'code': 'fields-not-given'}, status=400)
 
@@ -67,9 +67,10 @@ def update_catagory(request, pk):
         exists, fields = getUpdateFieldsOfRequest(
             request, Categories().get_updatible_fields())
 
-        if exists:
-            Categories.objects.get(id=pk, user=user).update_fields(**fields)
-
+        if not exists:
+            #Todo: Validate fields first
+            Categories.objects.filter(id=pk, user=user).update(**fields)
+            
 
         return Response(data={'code':'successfull'},status=200)
 
