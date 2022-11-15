@@ -27,7 +27,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.save()
 
     def __str__(self):
-        return self.name or 'Not provided'
+        return self.first_name or 'Not provided'
 
     def is_verified(self):
         return self.email_verified
@@ -35,7 +35,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_updatible_fields(self):
         return [
-            'name',
+            'first_name',
+            'last_name',
         ]
 
 
