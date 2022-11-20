@@ -40,8 +40,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         ]
 
 
-    
-
 
 class VerifyEmailKey(models.Model):
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
@@ -65,3 +63,18 @@ class Categories(models.Model):
             'color'
         ]
 
+
+class Task(models.Model):
+    user                          = models.ForeignKey(User,on_delete=models.CASCADE)  #Owner of the task
+    temp_id                       = models.CharField(max_length=100)
+    parent_temp_id                = models.CharField(max_length=70)
+    parent                        = models.ForeignKey('Task',null=True,on_delete=models.CASCADE)
+    child_order                   = models.IntegerField(default=0)
+    on_server_creation_time       = models.DateTimeField(auto_now_add=True) 
+    catagory                      = models.ForeignKey(Categories,null=True,on_delete=models.SET_NULL)
+    content                       = models.CharField(max_length=200)
+    discription                   = models.TextField(max_length=5000,null=True)
+    due                           = models.DateField(null=True)
+    priorty                       = models.IntegerField(default=4)
+    is_checked                    = models.BooleanField(default=False)
+    is_deleted                    = models.BooleanField(default=False)
