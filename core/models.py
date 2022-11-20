@@ -53,9 +53,11 @@ class OutstandingTokenAdmin(OutstandingTokenDefaultAdmin):
 
 
 class Categories(models.Model):
-    user = models.ForeignKey(to=User, on_delete=models.CASCADE, null=False)
-    title = models.CharField(max_length=30, null=False)
-    color = models.CharField(max_length=10, null=False)
+    user                          = models.ForeignKey(to=User, on_delete=models.CASCADE, null=False)
+    temp_id                       = models.CharField(max_length=100)
+    on_server_creation_time       = models.DateTimeField(auto_now_add=True) 
+    title                         = models.CharField(max_length=30, null=False)
+    color                         = models.CharField(max_length=10, null=False)
 
     def get_updatible_fields(self):
         return [
