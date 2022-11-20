@@ -1,12 +1,15 @@
 
-def getFieldsOfRequest(request, fields):
+def getFieldsOfRequest(request, fields,required:list=None):
 
     return_response = {}
     fieldValues = []
 
+    if request is None:
+        required = fieldValues
+
     for field in fields:
         value = request.data.get(field, None)
-        if value is None:
+        if value is None and field in required:
             return_response.update({field: 'This field is required'})
             continue
 

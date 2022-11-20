@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from utils.user import check_email_exists
 from django.contrib.auth import authenticate
 
-from utils.request import getFieldsOfRequest, getUpdateFieldsOfRequest, serialize
+from utils.request import getFieldsOfRequest, getUpdateFieldsOfRequest
 
 @permission_classes([IsVerfified])
 @api_view(['PUT',])
@@ -30,8 +30,6 @@ def update_user(request):
             updated_fields.update({field:getattr(user_object,field)})        
 
     return Response(data={'code':'successfull','updated_fields':updated_fields},status=200)
-
-
 
 
 @permission_classes([IsAuthenticated])
