@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from utils.request import getFieldsOfRequest
 from utils.token import get_tokens_for_user
-from utils.user import check_email_exists
+from utils.user import check_email_exists,get_user_data
 from utils.validators import is_valid_email, is_valid_password
 
 import utils.otp as otp_utils
@@ -28,19 +28,19 @@ def register_user(request):
 
     if not is_valid_email(email):
         return Response(
-            {'fields': {'email': 'This field is invalid'}, 'code': 'invalid-email'})
+            {'fields': {'email': 'This field is invalid'}, 'code': 'invalid-email'}, status=400)
 
     is_valid, response = is_valid_password(password)
 
     if not is_valid:
         return Response(
-            {'fields': {'password': response}, 'code': 'weak-password'})
+            {'fields': {'password': response}, 'code': 'weak-password'}, status=400)
 
     already_exists = check_email_exists(email)
 
     if already_exists:
         return Response(
-            {'email': 'user already exists', 'code': 'already-exists'})
+            {'email': 'user already exists', 'code': 'already-exists'}, status=400)
 
     instance: User = User(
         email=email, first_name=f_name,last_name=l_name)
@@ -50,10 +50,12 @@ def register_user(request):
 
     threading.Thread(target=otp_utils.send_email_verification, args=(
         instance,)).start()  
+
     tokens = get_tokens_for_user(instance)
+    details = get_user_data(instance)
 
     return Response(
-        data={'code': 'successful', 'tokens': tokens}, status=200)
+        data={'code': 'successful', 'tokens': tokens,'details':details}, status=201)
 
 
 @permission_classes([IsAuthenticated, ])
@@ -78,4 +80,4 @@ def verify_email(request):
     user.mark_verified()
 
     return Response(
-        data={'code': 'successful'}, status=200)
+        data={'code': 'successful'}, status=200,)
