@@ -8,7 +8,7 @@ SECRET_KEY = 'django-insecure-oq-9j8s0+)rpg9@y5lem(-bhm*=p(-@x7b)7g*__85k0i6anf@
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 CORS_ORIGIN_ALLOW_ALL = True
 INSTALLED_APPS = [
