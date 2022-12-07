@@ -5,8 +5,8 @@ valid_actions = [
     'todo_check',
 
     'catagory_add',
-    'catgory_delete',
-    'catgory_update',
+    'catagory_delete',
+    'catagory_update',
 ]
 
 
