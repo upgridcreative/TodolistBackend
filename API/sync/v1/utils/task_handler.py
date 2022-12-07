@@ -27,20 +27,17 @@ def create_todo(uuid: str, args: dict, temp_id: str, user: User) -> list:
         return [uuid, status], None
 
     if 'parent_id' in paylod_fields:
-        print('First')
         if 'child_order' not in paylod_fields:
             # Need both child order and parent_id to create a subtask
             _createdObject.delete()
-            print('second')
             status = errors.ServerErrorCodes.missing_required_fields,
-            print(status)
             return [uuid, status], None
 
         child_order = args['child_order']
         parent_id = args['parent_id']
 
         parent_task_object = Task.objects.filter(
-            temp_id=parent_id, user=user).first() or Task.objects.filter(id=parent_id, user=user).first()
+            temp_id=parent_id, user=user).first() or Task.objects.filter(id=getIntObjectId(parent_id), user=user).first()
 
         if parent_task_object is None:
             _createdObject.delete()
@@ -60,7 +57,7 @@ def create_todo(uuid: str, args: dict, temp_id: str, user: User) -> list:
     if 'catagory_id' in paylod_fields:
         catagory_id = args['catagory_id']
         catagory_object = Categories.objects.filter(user=user, temp_id=catagory_id).first() or \
-            Categories.objects.filter(user=user, id=catagory_id).first()
+            Categories.objects.filter(user=user, id=getIntObjectId(catagory_id)).first()
 
         if catagory_object is not None:
             _createdObject.catagory = catagory_object
@@ -87,7 +84,7 @@ def update_todo(uuid: str, args: dict,  user: User) -> list:
     if 'catagory_id' in paylod_fields:
         catagory_id = args['catagory_id']
         catagory_object = Categories.objects.filter(user=user, temp_id=catagory_id).first() or \
-            Categories.objects.filter(user=user, id=catagory_id).first()
+            Categories.objects.filter(user=user, id=getIntObjectId(catagory_id)).first()
 
         if catagory_object is not None:
             todo_object.catagory = catagory_object
@@ -114,7 +111,6 @@ def delete_todo(uuid: str, args: dict,  user: User) -> list:
         return [uuid, status]
 
     todo_object.delete_task()
-
 
     status = 'ok'
     return [uuid, status]
@@ -256,12 +252,19 @@ def get_object_from_payload(args: dict, user: User, object_key: str, model: Mode
         return status, None
 
     object_id = args[object_key]
-
+    object_id_int = getIntObjectId(object_id)
     object = model.objects.filter(temp_id=object_id, user=user).first(
-    ) or model.objects.filter(id=object_id, user=user).first()
+    ) or model.objects.filter(id=object_id_int, user=user).first()
 
     if object is None:
         status = errors.ServerErrorCodes.item_not_found,
         return status, None
 
     return None, object
+
+
+def getIntObjectId(object_id):
+    try:
+        return int(object_id)
+    except:
+        return -1
