@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 
 from utils.permission import IsAuthenticated
 from .utils.parse import *
+from .utils.serializers import *
 from .utils.task_handler import (
     create_todo, getResorces, update_todo, delete_todo, set_todo_completion_status, create_catagory, update_catagory, delete_catagory)
 
@@ -35,7 +36,6 @@ def sync_api_main_v1(request):
         action_status = None
 
         if action['type'] == 'todo_add':
-            print(action)
             temp_id = action['temp_id']
 
             action_status, indie_temp_id_mapping = create_todo(
@@ -59,10 +59,12 @@ def sync_api_main_v1(request):
                 uuid=uuid, args=args, user=user, isComplete=False)
 
         elif action['type'] == 'catagory_add':
+            temp_id = action['temp_id']
+
             action_status, indie_temp_id_mapping = create_catagory(
-                uuid=uuid, args=args, user=user,
-            )
-            temp_id_mapping.update(indie_temp_id_mapping)
+                uuid=uuid, args=args, user=user, temp_id=temp_id)
+            if indie_temp_id_mapping is not None:
+                temp_id_mapping.update(indie_temp_id_mapping)
 
         elif action['type'] == 'catagory_update':
             action_status = update_catagory(
@@ -87,10 +89,10 @@ def sync_api_main_v1(request):
     last_action = actions[-1]
 
     cat_last_creation_date = Categories.objects.all().order_by('on_server_creation_time'
-    ).last().on_server_creation_time if Categories.objects.all().exists() else None
+                                                               ).last().on_server_creation_time if Categories.objects.all().exists() else None
 
     task_last_creation_date = Task.objects.all().order_by('on_server_creation_time'
-    ).last().on_server_creation_time if Task.objects.all().exists() else None
+                                                          ).last().on_server_creation_time if Task.objects.all().exists() else None
 
     if task_last_creation_date is None and cat_last_creation_date is None:
         new_sync_token = ''
@@ -100,22 +102,32 @@ def sync_api_main_v1(request):
 
     else:
         new_sync_token = cat_last_creation_date if cat_last_creation_date > task_last_creation_date else task_last_creation_date
-    
+
     # Done with the actions #MubrakMe
 
     if 'all' in resources:
-        resources = ['catagories', 'tasks']  # This includes everything
+        resources = ['catagories', 'todos']  # This includes everything
 
     for resource in resources:
+        if resource == 'todos':
+            obtained = getResorces(Task, sync_token, user=user)
+            all_tasks = []
+            for item in obtained:
+                serialized = TaskSerializer(item)
+
+                all_tasks.append(serialized.data)
+
+            requested_resources.update({'tasks': all_tasks})
+
         if resource == 'catagories':
-            obtained = getResorces(Categories, sync_token)
-            requested_resources.update({'catagories': obtained})
+            obtained = getResorces(Categories, sync_token, user=user)
+            all_catagory = []
+            for item in obtained:
+                serialized = CatagorySerializer(item)
 
-        if resource == 'tasks':
-            obtained = getResorces(Task, sync_token)
-            requested_resources.update({'tasks': obtained})
+                all_catagory.append(serialized.data)
 
-    print(**requested_resources)
+            requested_resources.update({'catagories': all_catagory})
 
     return Response(data={
         # 'full_sync':sync_token  #todo add later
