@@ -24,4 +24,5 @@ def set_new_password(user_email: str, new_password: str) -> User:
 def get_user_data(user: User) -> dict:
     return {
         'first_name': user.first_name,
+        'last_name': user.last_name,
     }

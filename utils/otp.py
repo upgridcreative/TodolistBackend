@@ -24,6 +24,7 @@ def send_otp(email, otp) -> bool:
 
 def send_email_verification(user: User) -> str:
     otp = generate_otp_email_verify(user)
+    print(otp)
     send_otp(user.email, otp)
 
 

@@ -8,6 +8,7 @@ def get_tokens_for_user(user: User):
     outstanding_tokens = OutstandingToken.objects.filter(
         user=user)
 
+    #Todo: Make this process skipable or exclude when multiple devie support added
     for out_token in outstanding_tokens:
         if hasattr(out_token, 'blacklistedtoken'):
             # Token already blacklisted. Skip
