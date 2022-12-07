@@ -17,7 +17,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(_('last_name'), max_length=30)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name']
+    REQUIRED_FIELDS = ['first_name']
     objects = CustomUserManager()
 
     email_verified = models.BooleanField(default=False)
