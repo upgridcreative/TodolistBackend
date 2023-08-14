@@ -1,1 +1,1 @@
-web: gunicron TodolistBackend.wsgi 
+web: python3 manage.py runserver
