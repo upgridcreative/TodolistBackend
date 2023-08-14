@@ -137,7 +137,7 @@ def set_todo_completion_status(uuid: str, args: dict,  user: User, isComplete: b
 
 def create_catagory(uuid: str, args: dict,  user: User, temp_id) -> list:
     paylod_fields: list = args.keys()
-    required_fields = ['title', 'color']
+    required_fields = ['title',]
 
     for field in required_fields:
         if field not in paylod_fields:
@@ -147,7 +147,6 @@ def create_catagory(uuid: str, args: dict,  user: User, temp_id) -> list:
 
     _createdObject, isCreated = Categories.objects.get_or_create(
         temp_id=temp_id, user=user)
-
     if not isCreated:  # existed already
         status = errors.ServerErrorCodes.conflicting_temp_id
 
@@ -267,4 +266,4 @@ def getIntObjectId(object_id):
     try:
         return int(object_id)
     except:
-        return -1
+        return -1 ## -1 wont exist as an id

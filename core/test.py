@@ -3,183 +3,200 @@ from .models import *
 from django.db.utils import *
 
 from API.sync.v1.utils.task_handler import *
-
+import requests
+import json
 
 class TaskTest(TestCase):
-    def setUp(self) -> None:
+	access: str
+	json: dict
 
-        User.objects.create(email='test@test.com',
-                            password='jopefasd3111waA', first_name='Farhan')
+	def setUp(self) -> None:
+		print('je;;l')
 
-        user = User.objects.get(id=1)
+		response = requests.post(
+			url='http://127.0.0.1:8000/api/auth/login/',
+			json={
+				'email': 'farhansyedain@gmail.com',
+				'password': 'farhan11',
+			}
+		)
+		self.access = response.json()['tokens']['access']
+		self.json = response.json()
+		self.createTasks()
 
-        actions = [
+	def createTasks(self):
+		payload = {
+			'actions': [
+				{
+					'uuid': 'f-1',  # For future testing
+					'temp_id': 'ft-1',
+					'args': {
+									"content": "Testting Todo 1",
+					},
+					'type': 'todo_add',
+				},
+				{
+					'uuid': 'f-2',  # For future testing
+					'temp_id': 'ft-2',
+					'args': {
+									"content": "Testting Todo 2",
+					},
+					'type': 'todo_add',
+				},
 
-            {  # Should be sucessfull
-                'uuid': 1,
-                'temp_id': 't-1',
-                'args': {
-                    'title': 'Test',
-                    'color': 'white',
+				# start form here ===================
+				{
+					'uuid': '1',  # Simply try adding a todo -> 1:ok
+					'temp_id': 't-1',
+					'args': {
+						"content": "First Todo",
+					},
+					'type': 'todo_add',
+				},
+				{
+					'uuid': '2',  # Simply try adding a todo with other fields too-> 1:ok
+					'temp_id': 't-2',
+					'args': {
+						"content": "Second Todo",
+						"due": '2022-12-8',
+						'discription': 'This is the discriptino of the second task',
+						'priorty': 1,
+						'parent_id': 1,
+						'child_order': 1,
 
-                },
-                'user': user,
+					},
+					'type': 'todo_add',
+				},
+				{
+					'uuid': '3',  # This should not exicute since we wont pass chidl order this time
+					'temp_id': 't-3',
+					'args': {
+						"content": "Third Todo",
+						"due": '2022-12-8',
+						'discription': 'This is the discriptino of the second task',
+						'priorty': 1,
+						'parent_id': 1,
+						# 'child_order': 1,
+					},
+					'type': 'todo_add',
+				},
+				{
+					'uuid': '4',  # Didn't pass the required fields, shoul'd not exicute
+					'temp_id': 't-4',
+					'args': {
 
-            },
+					},
+					'type': 'todo_add',
+				},
+				{
+					'uuid': '5',  # The temp_id is confilcting
+					'temp_id': 't-3',
+					'args': {
 
-            {  # Missing title
-                'uuid': 2,
-                'temp_id': 't-2',
-                'args': {
-                    'color': 'white',
-                },
-                'user': user,
+					},
+					'type': 'todo_add',
+				},
 
-            },
-
-            {  # Missing color
-                'uuid': 3,
-                'temp_id': 't-3',
-
-                'args': {
-                    'title': 'white',
-
-                },
-                'user': user,
-
-            },
-            {  # title already exists
-                'uuid': 11,
-                'temp_id': 't-4',
-
-                'args': {
-                    'title': 'Test',
-                    'color': 'Doenstl matetr can be repeatedl',
-
-                },
-                'user': user,
-
-            },
-            {  # Reserve this for testing update
-                'uuid': 11,
-                'temp_id': 't-11',
-
-                'args': {
-                    'title': 'Test 1',
-                    'color': 'Doenstl matetr can be repeatedl',
-
-                },
-                'user': user,
-
-            },
-
-        ]
-
-        updates = [
-
-
-            {
-                'uuid': 5,
-                'args': {
-                    'title': 'New Title',
-                    'catagory_id': 1,  # will update uuid 1
-                },
-                'user': user,
-            },
-            {
-                'uuid': 6,
-                'args': {
-                    'color': 'New Color',
-                    'title': 'New new title',
-                    'catagory_id': 1,  # will update uuid 1
-                },
-                'user': user,
-            },
-            {
-                'uuid': 7,
-                'args': {
-                },
-                'user': user,
-            },
-            {
-                'uuid': 8,
-                'args': {
-                    'catagory_id': 1
-                },
-                'user': user,
-            },
-            {
-                'uuid': 9,
-                'args': {
-                    'catagory_id': 1,
-                    'title': 'New new title',
-
-                },
-                'user': user,
-            },
-
-            {
-                'uuid': 10,
-                'args': {
-                    'catagory_id': 3,
-                    'title': 'New new title',
-
-                },
-                'user': user,
-            },
-        ]
-
-        deletitions = [
-
-
-
-            {
-
-                'uuid': 'd-1',
-                'args': {
-                    'catagory_id': 1,
-                }, 'user': user,
-            },
-            {
-
-                'uuid': 'd-1',
-                'args': {
-                    'catagory_id': 2,
-                }, 'user': user,
-            },
-            {
-
-                'uuid': 'd-1',
-                'args': {
-                }, 'user': user,
-            },
-
-        ]
-
-        for action in actions:
-            response = create_catagory(
-                **action
-            )
-            print(response)
-
-        for update in updates:
-            response = update_catagory(
-                **update
-            )
-            print(response)
+				{
+					'uuid': '5',  # The content is confilting should still be ok
+					'temp_id': 't-5',
+					'args': {
+						'content': 'First Todo'
+					},
+					'type': 'todo_add',
+				},
+				{
+					'uuid': '6',  # The parent doens't exist
+					'temp_id': 't-6',
+					'args': {
+						'content': 'First Todo',
+						'parent_id': 10,
+						'child_order': 1
+					},
+					'type': 'todo_add',
+				},
+				{
+					'uuid': '8',  # pass temp id of the parent
+					'temp_id': 't-7',
+					'args': {
+						'content': 'First Todo',
+						'parent_id': 't-1',
+						'child_order': 1
+					},
+					'type': 'todo_add',
+				},
+				{
+					'uuid': '9',  # Catagory doens't exist , but it should still pas
+					'temp_id': 't-8',
+					'args': {
+						'content': 'First Todo',
+						'catagory_id': 1
+					},
+					'type': 'todo_add',
+				},
 
 
-    
+				# --------------Update releated now------------
+				{
+					'uuid': '10',  # Catagory doens't exist , but it should still pas and update
+					'args': {
+						'content': 'First Todo updated',
+						'todo_id': 3,
+						'catagory_id': 1,
+					},
+					'type': 'todo_update',
+				},
 
-    def testDates(self):
-        all_tasks = Categories.objects.all()
-        
-        dt = all_tasks.first().on_server_creation_time
-        dtt = all_tasks.last().on_server_creation_time
+				{
+					'uuid': '11',  # missing a require field
+					'args': {
 
-        print(dt> dtt)
+					},
+					'type': 'todo_update',
+				},
 
-        # print(all_tasks)
+				{
+					'uuid': '12',  # pass temp_id and uodate other fields too
+					'args': {
+						'todo_id': 't-2',
+						'due': '2002-11-11',  # valid
+					},
+					'type': 'todo_update',
+				},
 
-        r = getResorces(Categories,dtt,user=all_tasks.first().user)
-        print(r)
+				# Now deleteing stuff
+
+				{
+					'uuid': '13',  # pass temp_id and uodate other fields too
+					'args': {
+						'todo_id': 1,
+					},
+					'type': 'todo_delete',
+				},
+				{
+					'uuid': '14',  # pass temp_id and uodate other fields too
+					'args': {
+						'todo_id': 'ft-2',
+					},
+					'type': 'todo_delete',
+				},
+
+				{
+					'uuid': '15',  # pass temp_id and uodate other fields too
+					'args': {
+					},
+					'type': 'todo_delete',
+				},
+
+
+			]
+		}
+
+		response = requests.post(
+			url='http://127.0.0.1:8000/api/sync/v1/',
+			headers={
+				'Authorization': f'Bearer {self.access}', }, json=payload,
+		)
+
+		
+TaskTest().setUp()

@@ -86,8 +86,6 @@ def sync_api_main_v1(request):
 
         action_statuses.append({action_status[0]: status_value})
 
-    last_action = actions[-1]
-
     cat_last_creation_date = Categories.objects.all().order_by('on_server_creation_time'
                                                                ).last().on_server_creation_time if Categories.objects.all().exists() else None
 
@@ -109,6 +107,7 @@ def sync_api_main_v1(request):
         resources = ['catagories', 'todos']  # This includes everything
 
     for resource in resources:
+        print(resource);
         if resource == 'todos':
             obtained = getResorces(Task, sync_token, user=user)
             all_tasks = []

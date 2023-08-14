@@ -19,6 +19,7 @@ def register_user(request):
         request, ['email', 'password', 'first_name','last_name'])
 
     if not exists:
+        print('error')
         return Response(
             data={'required': response, 'code': 'fields-not-given'}, status=400)
 
@@ -27,18 +28,24 @@ def register_user(request):
     # Todo:Check if email exists (as in if the email is realy a valid email)
 
     if not is_valid_email(email):
+        print('error 2')
+
         return Response(
             {'fields': {'email': 'This field is invalid'}, 'code': 'invalid-email'}, status=400)
 
     is_valid, response = is_valid_password(password)
 
-    if not is_valid:
-        return Response(
-            {'fields': {'password': response}, 'code': 'weak-password'}, status=400)
+    # if not is_valid:
+    #     print('error 22')
+
+    #     return Response(
+    #         {'fields': {'password': response}, 'code': 'weak-password'}, status=400)
 
     already_exists = check_email_exists(email)
 
     if already_exists:
+        print('error2222')
+
         return Response(
             {'email': 'user already exists', 'code': 'already-exists'}, status=400)
 
