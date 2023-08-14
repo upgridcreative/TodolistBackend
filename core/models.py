@@ -55,7 +55,7 @@ class Categories(models.Model):
     temp_id = models.CharField(max_length=100)
     on_server_creation_time = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=30, null=False)
-    color = models.CharField(max_length=10, null=False)
+    color = models.CharField(max_length=10, null=True,default='Remove later')
     is_deleted = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs) -> None:
