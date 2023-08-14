@@ -1,1 +1,2 @@
-web: gunicron TodolistBackend.wsgi 
+release: python manage.py migrate
+web: gunicorn TodolistBackend.wsgi 
