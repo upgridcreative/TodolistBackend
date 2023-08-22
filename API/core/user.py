@@ -37,17 +37,15 @@ def update_user(request):
 def delete_user(request):
 
     exists, response, fieldValues = getFieldsOfRequest(
-        request, ['email', 'password'])
+        request, [ 'password'])
 
     if not exists:
         return Response(data={'required': response, 'code': 'fields-not-given'}, status=400)
 
-    email, password = fieldValues
+    password = fieldValues[0]
 
-    if not check_email_exists(email):
-        return Response(data={'email': 'No user exists with this email adress', 'code': 'no-user-exists'})
-
-    user = authenticate(request, email=email, password=password)
+ 
+    user = authenticate(request, email=request.user.email, password=password)
 
     if user is None:
         return Response(data={'password': 'This field is incorrect', 'code': 'incorrect-password'})
@@ -55,4 +53,4 @@ def delete_user(request):
     user.delete()
 
     # Todo :  status code correction
-    return Response(data={'code': 'sucessfull'}, status=201)
+    return Response(data={'code': 'successful'}, status=201)
