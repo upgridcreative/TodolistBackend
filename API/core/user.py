@@ -53,4 +53,4 @@ def delete_user(request):
     user.delete()
 
     # Todo :  status code correction
-    return Response(data={'code': 'successful'}, status=201)
+    return Response(data={'code': 'successful'}, status=200)
